@@ -5,7 +5,6 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	t.Log(NUMBER)
 	inputs := []string{
 		"1 + 2 + 3",
 		"1 * 2 + 3",

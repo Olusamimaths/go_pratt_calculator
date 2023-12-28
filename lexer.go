@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -47,6 +48,11 @@ func (l *Lexer) Expect(t string) bool {
 	return true
 }
 
+func normalizeRegExp(re *regexp.Regexp) *regexp.Regexp {
+	source := re.String()
+	return regexp.MustCompile("^" + source)
+}
+
 // Creates a new lexer for a given string
 // The string is tokenized and the Lexer is initialized from the tokens in the string
 func NewLexer(s string) Lexer {
@@ -58,19 +64,20 @@ func NewLexer(s string) Lexer {
 		var tokenType string
 		var match string
 
-		for _, t := range Tokens {
-			if t.Re.MatchString(s) {
+		for _, t := range TokenMatchers {
+			norm := normalizeRegExp(t.Re)
+			if norm.MatchString(s) {
 				tokenType = t.Type
-				match = t.Re.FindString(s)
-				break
+				match = norm.FindString(s)
+
+				tkns = append(tkns, Token{Type: tokenType, Value: match})
+				// this removes the matched string from the input string s
+				// and assigns s to the rest of the string
+				s = s[len(match):]
 			}
 		}
 
-		tkns = append(tkns, Token{Type: tokenType, Value: match})
-		// this removes the matched string from the input string s
-		// and assigns s to the rest of the string
-		s = s[len(match):]
 	}
 
-	return Lexer{Tokens: tkns, Position: 0}
+	return Lexer{Tokens: tkns, Position: -1}
 }

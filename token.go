@@ -23,20 +23,22 @@ type Token struct {
 	Value string
 }
 
-var Tokens = []struct {
+// The order of the slice matters; when there is potential ambiguity in the input
+// The Lexer will try to match input with the regex in order the regex are defined
+// The first matching token will be choosen
+var TokenMatchers = []struct {
 	Type string
 	Re   *regexp.Regexp
 }{
-	{Type: LPAREN, Re: regexp.MustCompile(`\(`)},
-	{Type: RPAREN, Re: regexp.MustCompile(`\)`)},
-	{Type: EXPONENTIAL, Re: regexp.MustCompile(`\^`)},
-	{Type: DIVIDE, Re: regexp.MustCompile(`/`)},
-	{Type: MULT, Re: regexp.MustCompile(`\*`)},
-	{Type: MINUS, Re: regexp.MustCompile(`-`)},
-	{Type: PLUS, Re: regexp.MustCompile(`\+`)},
-
 	{Type: NUMBER, Re: regexp.MustCompile(`(?:\d+(?:\.\d*)?|\.\d+)`)},
 	{Type: IDENTIFIER, Re: regexp.MustCompile(`[A-Za-z]+`)},
+	{Type: PLUS, Re: regexp.MustCompile(`\+`)},
+	{Type: MINUS, Re: regexp.MustCompile(`-`)},
+	{Type: MULT, Re: regexp.MustCompile(`\*`)},
+	{Type: DIVIDE, Re: regexp.MustCompile(`\/`)},
+	{Type: EXPONENTIAL, Re: regexp.MustCompile(`\^`)},
+	{Type: LPAREN, Re: regexp.MustCompile(`\(`)},
+	{Type: RPAREN, Re: regexp.MustCompile(`\)`)},
 }
 
 type BindingPowers map[string]int
