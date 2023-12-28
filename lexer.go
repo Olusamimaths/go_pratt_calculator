@@ -9,7 +9,7 @@ import (
 // Represents end of file (EOF)
 var EOF = Token{
 	Type:  "",
-	TokenLiteral: "",
+	Literal: "",
 }
 
 // A Lexer contains all the tokens after lexing a given string
@@ -19,7 +19,7 @@ type Lexer struct {
 	Position int
 }
 
-// Returns the TokenLiteral of the current token Position in lexer points to
+// Returns the Literal of the current token Position in lexer points to
 // if Position is out of bonds, returns EOF token
 func (l *Lexer) CurToken() Token {
 	if l.Position >= len(l.Tokens) {
@@ -70,7 +70,7 @@ func NewLexer(s string) Lexer {
 				tokenType = t.Type
 				match = norm.FindString(s)
 
-				tkns = append(tkns, Token{Type: tokenType, TokenLiteral: match})
+				tkns = append(tkns, Token{Type: tokenType, Literal: match})
 				// this removes the matched string from the input string s
 				// and assigns s to the rest of the string
 				s = s[len(match):]
