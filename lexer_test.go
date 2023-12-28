@@ -9,6 +9,11 @@ func TestNextToken(t *testing.T) {
 		"1 + 2 + 3",
 		"1 * 2 + 3",
 		"1 - 2 * 3",
+		"1 - 2 / 3",
+		"1 * 2 / 3",
+		"1 * 2 * 3",
+		"1 / 2 / 3",
+		"1 - 2 - 3",
 	}
 
 	results := map[int][]Token{
@@ -31,6 +36,41 @@ func TestNextToken(t *testing.T) {
 			{Type: MINUS, Value: "-"},
 			{Type: NUMBER, Value: "2"},
 			{Type: MULT, Value: "*"},
+			{Type: NUMBER, Value: "3"},
+		},
+		3: {
+			{Type: NUMBER, Value: "1"},
+			{Type: MINUS, Value: "-"},
+			{Type: NUMBER, Value: "2"},
+			{Type: DIVIDE, Value: "/"},
+			{Type: NUMBER, Value: "3"},
+		},
+		4: {
+			{Type: NUMBER, Value: "1"},
+			{Type: MULT, Value: "*"},
+			{Type: NUMBER, Value: "2"},
+			{Type: DIVIDE, Value: "/"},
+			{Type: NUMBER, Value: "3"},
+		},
+		5: {
+			{Type: NUMBER, Value: "1"},
+			{Type: MULT, Value: "*"},
+			{Type: NUMBER, Value: "2"},
+			{Type: MULT, Value: "*"},
+			{Type: NUMBER, Value: "3"},
+		},
+		6: {
+			{Type: NUMBER, Value: "1"},
+			{Type: DIVIDE, Value: "/"},
+			{Type: NUMBER, Value: "2"},
+			{Type: DIVIDE, Value: "/"},
+			{Type: NUMBER, Value: "3"},
+		},
+		7: {
+			{Type: NUMBER, Value: "1"},
+			{Type: MINUS, Value: "-"},
+			{Type: NUMBER, Value: "2"},
+			{Type: MINUS, Value: "-"},
 			{Type: NUMBER, Value: "3"},
 		},
 	}
