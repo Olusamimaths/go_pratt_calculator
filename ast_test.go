@@ -6,13 +6,15 @@ import (
 
 func TestAST(t *testing.T) {
 	expression := &InfixExpression{
-		Token: Token{Type: PLUS, Literal: "+"},
+		Token:    Token{Type: PLUS, Literal: "+"},
+		Operator: "+",
 		Left: &NumberLiteral{
 			Token: Token{Type: NUMBER, Literal: "1"},
 			Value: 1,
 		},
 		Right: &InfixExpression{
-			Token: Token{Type: MULT, Literal: "*"},
+			Token:    Token{Type: MULT, Literal: "*"},
+			Operator: "*",
 			Left: &NumberLiteral{
 				Token: Token{Type: NUMBER, Literal: "2"},
 				Value: 2,
@@ -24,7 +26,7 @@ func TestAST(t *testing.T) {
 		},
 	}
 
-	if expression.String() != "1 + (2 * 3)" {
+	if expression.String() != "(1 + (2 * 3))" {
 		t.Errorf("wrong expression. got=%q", expression.String())
 	}
 }
