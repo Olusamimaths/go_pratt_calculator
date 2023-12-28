@@ -11,7 +11,7 @@ type PrefixExpression struct {
 }
 
 func (p *PrefixExpression) TokenLiteral() string {
-	return p.Token.Value
+	return p.Token.TokenLiteral
 }
 
 type InfixExpression struct {
@@ -22,5 +22,5 @@ type InfixExpression struct {
 }
 
 func (i *InfixExpression) TokenLiteral() string {
-	return i.Token.Value
+	return i.Token.TokenLiteral
 }

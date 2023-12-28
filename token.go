@@ -20,7 +20,7 @@ const (
 
 type Token struct {
 	Type  string
-	Value string
+	TokenLiteral string
 }
 
 // The order of the slice matters; when there is potential ambiguity in the input
