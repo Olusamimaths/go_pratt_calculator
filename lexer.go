@@ -42,22 +42,6 @@ func (l *Lexer) Expect(t string) bool {
 }
 
 func Lex(s string) Lexer {
-	tokens := []struct {
-		Type string
-		Re   *regexp.Regexp
-	}{
-		{Type: "(", Re: regexp.MustCompile(`\(`)},
-		{Type: ")", Re: regexp.MustCompile(`\)`)},
-		{Type: "^", Re: regexp.MustCompile(`\^`)},
-		{Type: "/", Re: regexp.MustCompile(`/`)},
-		{Type: "*", Re: regexp.MustCompile(`\*`)},
-		{Type: "-", Re: regexp.MustCompile(`-`)},
-		{Type: "+", Re: regexp.MustCompile(`\+`)},
-
-		{Type: "NUMBER", Re: regexp.MustCompile(`(?:\d+(?:\.\d*)?|\.\d+)`)},
-		{Type: "IDENTIFIER", Re: regexp.MustCompile(`[A-Za-z]+`)},
-	}
-
 	s = strings.ReplaceAll(s, " ", "")
 	var tkns []Token
 
@@ -65,7 +49,7 @@ func Lex(s string) Lexer {
 		var tokenType string
 		var match string
 
-		for _, t := range tokens {
+		for _, t := range Tokens {
 			if t.Re.MatchString(s) {
 				tokenType = t.Type
 				match = t.Re.FindString(s)
