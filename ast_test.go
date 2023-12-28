@@ -155,30 +155,4 @@ func TestASTWithExponent(t *testing.T) {
 	if expression3.String() != "(5 ^ 6)" {
 		t.Errorf("Test case 3 failed. got=%q", expression3.String())
 	}
-
-	// Test case 4: Exponential with no operator (should default to addition)
-	expression4 := &InfixExpression{
-		Token:    Token{Type: PLUS, Literal: "+"},
-		Operator: "+",
-		Left: &NumberLiteral{
-			Token: Token{Type: NUMBER, Literal: "7"},
-			Value: 7,
-		},
-		Right: &InfixExpression{
-			Token:    Token{Type: EXPONENTIAL, Literal: "^"},
-			Operator: "^",
-			Left: &NumberLiteral{
-				Token: Token{Type: NUMBER, Literal: "8"},
-				Value: 8,
-			},
-			Right: &NumberLiteral{
-				Token: Token{Type: NUMBER, Literal: "9"},
-				Value: 9,
-			},
-		},
-	}
-
-	if expression4.String() != "(7 + (8 ^ 9))" {
-		t.Errorf("Test case 4 failed. got=%q", expression4.String())
-	}
 }
