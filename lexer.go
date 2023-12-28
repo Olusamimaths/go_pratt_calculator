@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 )
 
@@ -16,7 +15,7 @@ type Lexer struct {
 	Position int
 }
 
-func (l *Lexer) Peek() Token {
+func (l *Lexer) CurToken() Token {
 	if l.Position >= len(l.Tokens) {
 		return EOF
 	}
@@ -24,7 +23,7 @@ func (l *Lexer) Peek() Token {
 	return l.Tokens[l.Position]
 }
 
-func (l *Lexer) Next() Token {
+func (l *Lexer) NextToken() Token {
 	nextIndex := l.Position + 1
 	if nextIndex >= len(l.Tokens) {
 		return EOF
@@ -34,7 +33,7 @@ func (l *Lexer) Next() Token {
 }
 
 func (l *Lexer) Expect(t string) bool {
-	token := l.Next()
+	token := l.NextToken()
 	if token.Type != t {
 		panic(fmt.Sprintf("Invalid token encountered: %+v\n", token))
 	}
