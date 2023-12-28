@@ -14,6 +14,8 @@ func TestNextToken(t *testing.T) {
 		"1 * 2 * 3",
 		"1 / 2 / 3",
 		"1 - 2 - 3",
+		"1.2 - 2.34 - 3.567",
+		"1 * 2.34 / 3.567",
 	}
 
 	results := map[int][]Token{
@@ -73,6 +75,20 @@ func TestNextToken(t *testing.T) {
 			{Type: MINUS, Literal: "-"},
 			{Type: NUMBER, Literal: "3"},
 		},
+		8: {
+			{Type: NUMBER, Literal: "1.2"},
+			{Type: MINUS, Literal: "-"},
+			{Type: NUMBER, Literal: "2.34"},
+			{Type: MINUS, Literal: "-"},
+			{Type: NUMBER, Literal: "3.567"},
+		},
+		9: {
+			{Type: NUMBER, Literal: "1"},
+			{Type: MULT, Literal: "*"},
+			{Type: NUMBER, Literal: "2.34"},
+			{Type: DIVIDE, Literal: "/"},
+			{Type: NUMBER, Literal: "3.567"},
+		},
 	}
 
 	for i, input := range inputs {
@@ -85,7 +101,12 @@ func TestNextToken(t *testing.T) {
 			}
 
 			if tok.Literal != tt.Literal {
-				t.Fatalf("test [%d] token Literal wrong. expected=%q, got=%q", i, tt.Literal, tok.Literal)
+				t.Fatalf(
+					"test [%d] token Literal wrong. expected=%q, got=%q",
+					i,
+					tt.Literal,
+					tok.Literal,
+				)
 			}
 		}
 	}
