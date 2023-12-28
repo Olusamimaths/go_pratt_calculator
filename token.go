@@ -20,7 +20,7 @@ const (
 
 type Token struct {
 	Type  string
-	Match string
+	Value string
 }
 
 var Tokens = []struct {
@@ -37,4 +37,18 @@ var Tokens = []struct {
 
 	{Type: NUMBER, Re: regexp.MustCompile(`(?:\d+(?:\.\d*)?|\.\d+)`)},
 	{Type: IDENTIFIER, Re: regexp.MustCompile(`[A-Za-z]+`)},
+}
+
+type BindingPowers map[string]int
+
+var BPS = BindingPowers{
+	NUMBER:      0,
+	IDENTIFIER:  0,
+	RPAREN:      0,
+	PLUS:        10,
+	MINUS:       10,
+	MULT:        20,
+	DIVIDE:      20,
+	EXPONENTIAL: 30,
+	LPAREN:      40,
 }

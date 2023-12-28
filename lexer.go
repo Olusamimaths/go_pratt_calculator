@@ -5,16 +5,21 @@ import (
 	"strings"
 )
 
+// Represents end of file (EOF)
 var EOF = Token{
 	Type:  "",
-	Match: "",
+	Value: "",
 }
 
+// A Lexer contains all the tokens after lexing a given string
+// the Position holds the current read position
 type Lexer struct {
 	Tokens   []Token
 	Position int
 }
 
+// Returns the value of the current token Position in lexer points to
+// if Position is out of bonds, returns EOF token
 func (l *Lexer) CurToken() Token {
 	if l.Position >= len(l.Tokens) {
 		return EOF
@@ -23,15 +28,17 @@ func (l *Lexer) CurToken() Token {
 	return l.Tokens[l.Position]
 }
 
+// Returns the next token after the current one, allowing us to peek one position forward
 func (l *Lexer) NextToken() Token {
-	nextIndex := l.Position + 1
-	if nextIndex >= len(l.Tokens) {
+	l.Position = l.Position + 1
+	if l.Position >= len(l.Tokens) {
 		return EOF
 	}
 
-	return l.Tokens[nextIndex]
+	return l.Tokens[l.Position]
 }
 
+// Checks that the next token is of a given type
 func (l *Lexer) Expect(t string) bool {
 	token := l.NextToken()
 	if token.Type != t {
@@ -40,7 +47,10 @@ func (l *Lexer) Expect(t string) bool {
 	return true
 }
 
-func Lex(s string) Lexer {
+// Creates a new lexer for a given string
+// The string is tokenized and the Lexer is initialized from the tokens in the string
+func NewLexer(s string) Lexer {
+	// remove all whitespaces
 	s = strings.ReplaceAll(s, " ", "")
 	var tkns []Token
 
@@ -56,7 +66,9 @@ func Lex(s string) Lexer {
 			}
 		}
 
-		tkns = append(tkns, Token{Type: tokenType, Match: match})
+		tkns = append(tkns, Token{Type: tokenType, Value: match})
+		// this removes the matched string from the input string s
+		// and assigns s to the rest of the string
 		s = s[len(match):]
 	}
 
