@@ -16,10 +16,14 @@ const (
 
 	NUMBER     = "NUMBER"
 	IDENTIFIER = "IDENTIFIER"
+
+	PREFIX = "PREFIX"
 )
 
+type TokenType string
+
 type Token struct {
-	Type  string
+	Type    TokenType
 	Literal string
 }
 
@@ -27,7 +31,7 @@ type Token struct {
 // The Lexer will try to match input with the regex in order the regex are defined
 // The first matching token will be choosen
 var TokenMatchers = []struct {
-	Type string
+	Type TokenType
 	Re   *regexp.Regexp
 }{
 	{Type: NUMBER, Re: regexp.MustCompile(`(?:\d+(?:\.\d*)?|\.\d+)`)},
@@ -41,16 +45,17 @@ var TokenMatchers = []struct {
 	{Type: RPAREN, Re: regexp.MustCompile(`\)`)},
 }
 
-type BindingPowers map[string]int
+type BindingPowers map[TokenType]int
 
 var BPS = BindingPowers{
-	NUMBER:      0,
-	IDENTIFIER:  0,
-	RPAREN:      0,
-	PLUS:        10,
-	MINUS:       10,
-	MULT:        20,
-	DIVIDE:      20,
-	EXPONENTIAL: 30,
-	LPAREN:      40,
+	NUMBER:      10,
+	IDENTIFIER:  10,
+	RPAREN:      10,
+	PLUS:        20,
+	MINUS:       20,
+	MULT:        30,
+	DIVIDE:      30,
+	EXPONENTIAL: 40,
+	LPAREN:      50,
+	PREFIX:      80,
 }

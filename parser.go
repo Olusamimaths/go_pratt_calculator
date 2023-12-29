@@ -1,13 +1,13 @@
 package main
 
 type (
-	nudFn func()
-	ledFn func(left Token)
+	nudFn func() Expression
+	ledFn func(left Expression) Expression
 )
 
 type (
-	nudFns map[string]nudFn
-	ledFns map[string]ledFn
+	nudFns map[TokenType]nudFn
+	ledFns map[TokenType]ledFn
 )
 
 type Parser struct {
@@ -18,4 +18,108 @@ type Parser struct {
 
 	NUDS nudFns
 	LEDS ledFns
+}
+
+func NewParser(l *Lexer) *Parser {
+	parser := &Parser{l: l}
+
+	parser.NUDS = make(nudFns)
+	parser.registerNud(MINUS, parser.parsePrefixExpression)
+
+	parser.LEDS = make(ledFns)
+	parser.registerLed(PLUS, parser.parseInfixExpression)
+	parser.registerLed(MINUS, parser.parseInfixExpression)
+	parser.registerLed(MULT, parser.parseInfixExpression)
+	parser.registerLed(DIVIDE, parser.parseInfixExpression)
+	parser.registerLed(EXPONENTIAL, parser.parseInfixExpression)
+
+	parser.initializeTokens()
+	return parser
+}
+
+func (p *Parser) registerNud(tokenType TokenType, fn nudFn) {
+	p.NUDS[tokenType] = fn
+}
+
+func (p *Parser) registerLed(tokenType TokenType, fn ledFn) {
+	p.LEDS[tokenType] = fn
+}
+
+func (p *Parser) Parse() Expression {
+	calculator := &Calculator{}
+
+	calculator.Expression = p.parseExpression(0)
+
+	return calculator
+}
+
+func (p *Parser) parsePrefixExpression() Expression {
+	expression := &PrefixExpression{
+		Operator: p.curToken.Literal,
+		Token:    p.curToken,
+	}
+
+	p.nextToken()
+
+	prefixBP := BPS[PREFIX]
+	expression.Right = p.parseExpression(prefixBP)
+
+	return expression
+}
+
+func (p *Parser) parseInfixExpression(left Expression) Expression {
+	expression := &InfixExpression{
+		Operator: p.curToken.Literal,
+		Token:    p.curToken,
+		Left:     left,
+	}
+
+	bindingPower := p.currentBindingPower()
+	p.nextToken()
+	expression.Right = p.parseExpression(bindingPower)
+
+	return expression
+}
+
+func (p *Parser) parseExpression(rbp int) Expression {
+	nud := p.NUDS[p.curToken.Type]
+	if nud == nil {
+		return nil
+	}
+	left := nud()
+
+	for p.peekBindingPower() > rbp {
+		led := p.LEDS[p.peekToken.Type]
+		p.nextToken()
+
+		left = led(left)
+	}
+	return left
+}
+
+func (p *Parser) peekBindingPower() int {
+	if bps, ok := BPS[p.peekToken.Type]; ok {
+		return bps
+	}
+
+	return 0
+}
+
+func (p *Parser) currentBindingPower() int {
+	if bps, ok := BPS[p.curToken.Type]; ok {
+		return bps
+	}
+
+	return 0
+}
+
+func (p *Parser) initializeTokens() {
+	p.nextToken() // first call sets p.peekToken vial p.l.NextToken
+	p.nextToken() // second call sets p.curToken to value of p.peekToken from first call,
+	// then p.peekToken is set to next token
+}
+
+func (p *Parser) nextToken() {
+	p.curToken = p.peekToken
+	p.peekToken = p.l.NextToken()
 }

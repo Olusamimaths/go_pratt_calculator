@@ -9,6 +9,13 @@ type Expression interface {
 	String() string
 }
 
+type Calculator struct {
+	Expression Expression
+}
+
+func (c *Calculator) TokenLiteral() string { return c.Expression.TokenLiteral() }
+func (c *Calculator) String() string       { return c.Expression.String() }
+
 type NumberLiteral struct {
 	Token Token
 	Value float64
