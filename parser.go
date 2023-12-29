@@ -23,6 +23,8 @@ type Parser struct {
 
 	NUDS nudFns
 	LEDS ledFns
+
+	errors []string
 }
 
 func NewParser(l *Lexer) *Parser {
@@ -64,7 +66,9 @@ func (p *Parser) parseNumberLiteral() Expression {
 
 	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
 	if err != nil {
-		panic(fmt.Sprintf("could not parse %q as a number", p.curToken.Literal))
+		msg := fmt.Sprintf("could not parse %q as a number", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
 	}
 
 	expression.Value = value
@@ -111,12 +115,17 @@ func (p *Parser) parseInfixExpression(left Expression) Expression {
 func (p *Parser) parseExpression(rbp int) Expression {
 	nud := p.NUDS[p.curToken.Type]
 	if nud == nil {
+		msg := fmt.Sprintf("could not find prefix parser for token type=%q", p.curToken.Type)
+		p.errors = append(p.errors, msg)
 		return nil
 	}
 	left := nud()
 
 	for p.peekBindingPower() > rbp {
 		led := p.LEDS[p.peekToken.Type]
+		if led == nil {
+			return left
+		}
 		p.nextToken()
 
 		left = led(left)
@@ -149,4 +158,8 @@ func (p *Parser) initializeTokens() {
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
 }

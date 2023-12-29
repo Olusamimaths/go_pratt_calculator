@@ -40,6 +40,7 @@ func TestExponentialParsing(t *testing.T) {
 		lexer := NewLexer(tt.input)
 		parser := NewParser(lexer)
 		calculator := parser.Parse()
+		checkParserErrors(t, parser)
 
 		actual := calculator.String()
 		if actual != tt.expected {
@@ -155,6 +156,7 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		lexer := NewLexer(tt.input)
 		parser := NewParser(lexer)
 		calculator := parser.Parse()
+		checkParserErrors(t, parser)
 
 		actual := calculator.String()
 		if actual != tt.expected {
@@ -178,6 +180,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		lexer := NewLexer(tt.input)
 		parser := NewParser(lexer)
 		calculator := parser.Parse()
+		checkParserErrors(t, parser)
 
 		exp, ok := calculator.Expression.(*PrefixExpression)
 		if !ok {
@@ -231,4 +234,19 @@ func nearlyEqual(a, b float64, epsilon ...float64) bool {
 	}
 
 	return diff/(math.Abs(a)+math.Abs(b)) < eps
+}
+
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+
+	if len(errors) == 0 {
+		return
+	}
+
+	t.Errorf("parser has %d errors", len(errors))
+	for _, msg := range errors {
+		t.Errorf("parser error: %q", msg)
+	}
+
+	t.FailNow()
 }
