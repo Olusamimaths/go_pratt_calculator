@@ -5,6 +5,53 @@ import (
 	"testing"
 )
 
+func TestOperatorPrecedenceParsing(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			"-2 * 3",
+			"((-2) * 3)",
+		},
+		{
+			"1 + 2 + 3",
+			"((1 + 2) + 3)",
+		},
+		{
+			"1 - 2 + 3",
+			"((1 - 2) + 3)",
+		},
+		{
+			"1 * 2 * 3",
+			"((1 * 2) * 3)",
+		},
+		{
+			"1 + 2 / 3",
+			"(1 + (2 / 3))",
+		},
+		{
+			"1 + 2 * 3 + 4 / 5 - 6",
+			"(((1 + (2 * 3)) + (4 / 5)) - 6)",
+		},
+		{
+			"-1 * -4",
+			"((-1) * (-4))",
+		},
+	}
+
+	for _, tt := range tests {
+		lexer := NewLexer(tt.input)
+		parser := NewParser(lexer)
+		calculator := parser.Parse()
+
+		actual := calculator.String()
+		if actual != tt.expected {
+			t.Errorf("expected=%q, got=%q", tt.expected, actual)
+		}
+	}
+}
+
 func TestParsingPrefixExpressions(t *testing.T) {
 	prefixTests := []struct {
 		input    string
