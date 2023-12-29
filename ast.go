@@ -4,11 +4,13 @@ import (
 	"bytes"
 )
 
+// The basic form of representation in the program, represents a parsed token and a Node of the AST
 type Expression interface {
 	TokenLiteral() string
 	String() string
 }
 
+// Calculator represents the 'program'
 type Calculator struct {
 	Expression Expression
 }

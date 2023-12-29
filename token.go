@@ -47,6 +47,7 @@ var TokenMatchers = []struct {
 
 type BindingPowers map[TokenType]int
 
+// Holds the relative binding powers (i.e precedence) of operators
 var BPS = BindingPowers{
 	NUMBER:      10,
 	IDENTIFIER:  10,

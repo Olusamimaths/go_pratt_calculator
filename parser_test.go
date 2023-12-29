@@ -210,7 +210,7 @@ func testNumberLiteral(t *testing.T, right Expression, expectedValue float64) bo
 }
 
 func nearlyEqual(a, b float64, epsilon ...float64) bool {
-	defaultEpsilon := 1e-9 // Set your default epsilon value here
+	defaultEpsilon := 1e-9
 
 	// Use the provided epsilon or the default value if not provided
 	var eps float64

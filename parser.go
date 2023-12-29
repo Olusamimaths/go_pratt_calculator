@@ -107,6 +107,7 @@ func (p *Parser) parseInfixExpression(left Expression) Expression {
 	return expression
 }
 
+// The core of the Pratt Parsing Algorithm
 func (p *Parser) parseExpression(rbp int) Expression {
 	nud := p.NUDS[p.curToken.Type]
 	if nud == nil {

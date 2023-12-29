@@ -48,11 +48,6 @@ func (l *Lexer) Expect(t TokenType) bool {
 	return true
 }
 
-func normalizeRegExp(re *regexp.Regexp) *regexp.Regexp {
-	source := re.String()
-	return regexp.MustCompile("^" + source)
-}
-
 // Creates a new lexer for a given string
 // The string is tokenized and the Lexer is initialized from the tokens in the string
 func NewLexer(s string) *Lexer {
@@ -65,7 +60,7 @@ func NewLexer(s string) *Lexer {
 		var match string
 
 		for _, t := range TokenMatchers {
-			norm := normalizeRegExp(t.Re)
+			norm := addStartAnchorToRegex(t.Re)
 			if norm.MatchString(s) {
 				tokenType = t.Type
 				match = norm.FindString(s)
@@ -80,4 +75,11 @@ func NewLexer(s string) *Lexer {
 	}
 
 	return &Lexer{Tokens: tkns, Position: -1}
+}
+
+// Ensures the regular expression has a start anchor (^),
+// indicating that the search should start at the beginning of the string.
+func addStartAnchorToRegex(re *regexp.Regexp) *regexp.Regexp {
+	source := re.String()
+	return regexp.MustCompile("^" + source)
 }
