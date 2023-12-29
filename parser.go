@@ -93,9 +93,16 @@ func (p *Parser) parseInfixExpression(left Expression) Expression {
 		Left:     left,
 	}
 
+	curTokenType := p.curToken.Type
+
 	bindingPower := p.currentBindingPower()
 	p.nextToken()
-	expression.Right = p.parseExpression(bindingPower)
+
+	if curTokenType == EXPONENTIAL {
+		expression.Right = p.parseExpression(bindingPower - 1)
+	} else {
+		expression.Right = p.parseExpression(bindingPower)
+	}
 
 	return expression
 }
