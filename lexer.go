@@ -8,7 +8,7 @@ import (
 
 // Represents end of file (EOF)
 var EOF = Token{
-	Type:  "",
+	Type:    "",
 	Literal: "",
 }
 
@@ -40,7 +40,7 @@ func (l *Lexer) NextToken() Token {
 }
 
 // Checks that the next token is of a given type
-func (l *Lexer) Expect(t string) bool {
+func (l *Lexer) Expect(t TokenType) bool {
 	token := l.NextToken()
 	if token.Type != t {
 		panic(fmt.Sprintf("Invalid token encountered: %+v\n", token))
@@ -55,13 +55,13 @@ func normalizeRegExp(re *regexp.Regexp) *regexp.Regexp {
 
 // Creates a new lexer for a given string
 // The string is tokenized and the Lexer is initialized from the tokens in the string
-func NewLexer(s string) Lexer {
+func NewLexer(s string) *Lexer {
 	// remove all whitespaces
 	s = strings.ReplaceAll(s, " ", "")
 	var tkns []Token
 
 	for len(s) > 0 {
-		var tokenType string
+		var tokenType TokenType
 		var match string
 
 		for _, t := range TokenMatchers {
@@ -79,5 +79,5 @@ func NewLexer(s string) Lexer {
 
 	}
 
-	return Lexer{Tokens: tkns, Position: -1}
+	return &Lexer{Tokens: tkns, Position: -1}
 }

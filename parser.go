@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"strconv"
+)
+
 type (
 	nudFn func() Expression
 	ledFn func(left Expression) Expression
@@ -24,6 +29,7 @@ func NewParser(l *Lexer) *Parser {
 	parser := &Parser{l: l}
 
 	parser.NUDS = make(nudFns)
+	parser.registerNud(NUMBER, parser.parseNumberLiteral)
 	parser.registerNud(MINUS, parser.parsePrefixExpression)
 
 	parser.LEDS = make(ledFns)
@@ -45,12 +51,25 @@ func (p *Parser) registerLed(tokenType TokenType, fn ledFn) {
 	p.LEDS[tokenType] = fn
 }
 
-func (p *Parser) Parse() Expression {
+func (p *Parser) Parse() *Calculator {
 	calculator := &Calculator{}
 
 	calculator.Expression = p.parseExpression(0)
 
 	return calculator
+}
+
+func (p *Parser) parseNumberLiteral() Expression {
+	expression := &NumberLiteral{Token: p.curToken}
+
+	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
+	if err != nil {
+		panic(fmt.Sprintf("could not parse %q as a number", p.curToken.Literal))
+	}
+
+	expression.Value = value
+
+	return expression
 }
 
 func (p *Parser) parsePrefixExpression() Expression {
