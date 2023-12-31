@@ -6,8 +6,8 @@ import (
 )
 
 type (
-	nudFn func() Expression
-	ledFn func(left Expression) Expression
+	nudFn func() (Expression, error)
+	ledFn func(left Expression) (Expression, error)
 )
 
 type (
@@ -56,27 +56,38 @@ func (p *Parser) registerLed(tokenType TokenType, fn ledFn) {
 func (p *Parser) Parse() *Calculator {
 	calculator := &Calculator{}
 
-	calculator.Expression = p.parseExpression(0)
+	expr, err := p.parseExpression(0)
+	if err != nil {
+		fmt.Println(err.Error())
+		panic("An error occured while parsing expression")
+	}
 
+	if expr == nil {
+		panic("error occurred when parsing the whole expression")
+	}
+	calculator.Expression = expr
 	return calculator
 }
 
-func (p *Parser) parseNumberLiteral() Expression {
+func (p *Parser) parseNumberLiteral() (Expression, error) {
 	expression := &NumberLiteral{Token: p.curToken}
 
 	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
 	if err != nil {
 		msg := fmt.Sprintf("could not parse %q as a number", p.curToken.Literal)
 		p.errors = append(p.errors, msg)
-		return nil
+		return nil, err
 	}
 
 	expression.Value = value
 
-	return expression
+	return expression, nil
 }
 
-func (p *Parser) parsePrefixExpression() Expression {
+func (p *Parser) parsePrefixExpression() (Expression, error) {
+	if p.curToken.Type == LPAREN || p.curToken.Type == RPAREN {
+		return nil, nil
+	}
 	expression := &PrefixExpression{
 		Operator: p.curToken.Literal,
 		Token:    p.curToken,
@@ -85,12 +96,16 @@ func (p *Parser) parsePrefixExpression() Expression {
 	p.nextToken()
 
 	prefixBP := BPS[PREFIX]
-	expression.Right = p.parseExpression(prefixBP)
+	expr, err := p.parseExpression(prefixBP)
+	if err != nil {
+		return nil, err
+	}
 
-	return expression
+	expression.Right = expr
+	return expression, nil
 }
 
-func (p *Parser) parseInfixExpression(left Expression) Expression {
+func (p *Parser) parseInfixExpression(left Expression) (Expression, error) {
 	expression := &InfixExpression{
 		Operator: p.curToken.Literal,
 		Token:    p.curToken,
@@ -103,34 +118,50 @@ func (p *Parser) parseInfixExpression(left Expression) Expression {
 	p.nextToken()
 
 	if curTokenType == EXPONENTIAL {
-		expression.Right = p.parseExpression(bindingPower - 1)
-	} else {
-		expression.Right = p.parseExpression(bindingPower)
+		bindingPower = bindingPower - 1
 	}
 
-	return expression
+	expr, err := p.parseExpression(bindingPower)
+	if err != nil {
+		return nil, err
+	}
+
+	expression.Right = expr
+	return expression, nil
 }
 
 // The core of the Pratt Parsing Algorithm
-func (p *Parser) parseExpression(rbp int) Expression {
+func (p *Parser) parseExpression(rbp int) (Expression, error) {
+	fmt.Printf("\ncurrent token %+v\n", p.curToken)
+
 	nud := p.NUDS[p.curToken.Type]
 	if nud == nil {
+		fmt.Println("Here")
 		msg := fmt.Sprintf("could not find prefix parser for token type=%q", p.curToken.Type)
 		p.errors = append(p.errors, msg)
-		return nil
+		return nil, nil
 	}
-	left := nud()
-
-	for p.peekBindingPower() > rbp {
+	fmt.Println("Left")
+	left, err := nud()
+	if err != nil {
+		return nil, err
+	}
+	for p.peekBindingPower() > rbp || p.curToken.Type == LPAREN {
+		if p.peekToken.Type == RPAREN {
+			break
+		}
 		led := p.LEDS[p.peekToken.Type]
 		if led == nil {
-			return left
+			return left, nil
 		}
 		p.nextToken()
 
-		left = led(left)
+		left, err = led(left)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return left
+	return left, nil
 }
 
 func (p *Parser) peekBindingPower() int {

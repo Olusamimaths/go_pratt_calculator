@@ -5,6 +5,66 @@ import (
 	"testing"
 )
 
+func TestParenthesisParsing(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			"(2 + 3)",
+			"(2 + 3)",
+		},
+		{
+			"(3.0 * 2.5)",
+			"(3.0 * 2.5)",
+		},
+		{
+			"(2 + (1 + 2))",
+			"(2 + (1 + 2))",
+		},
+		{
+			"(2.5 ^ 3.0) * 4.2",
+			"((2.5 ^ 3.0) * 4.2)",
+		},
+		{
+			"((1 + 2) * 3) ^ 2",
+			"(((1 + 2) * 3) ^ 2)",
+		},
+		{
+			"(2 ^ 3) * (4 + 1)",
+			"(((2 ^ 3) * (4 + 1)))",
+		},
+		// Additional test cases
+		{
+			"(2 ^ (2 ^ 3))",
+			"(2 ^ (2 ^ 3))",
+		},
+		{
+			"((2.0 + 3.5) * 4.1)",
+			"((2.0 + 3.5) * 4.1)",
+		},
+		{
+			"(2 ^ 2.5) / 4.0",
+			"((2 ^ 2.5) / 4.0)",
+		},
+		{
+			"(2 ^ (3 ^ 2)) * (4 + 1)",
+			"((2 ^ (3 ^ 2)) * (4 + 1))",
+		},
+	}
+
+	for _, tt := range tests {
+		lexer := NewLexer(tt.input)
+		parser := NewParser(lexer)
+		calculator := parser.Parse()
+
+		actual := calculator.String()
+		if actual != tt.expected {
+			t.Errorf("input=%q, expected=%q, got=%q", tt.input, tt.expected, actual)
+		}
+	}
+}
+
 func TestExponentialParsing(t *testing.T) {
 	tests := []struct {
 		input    string
