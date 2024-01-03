@@ -85,11 +85,23 @@ func main() {
 ``` -->
 
 ## Test
+You can execute the test files by running:
 
 ```
 go test -v
 ```
+## Local Testing
+After pulling the code down to your machine, you can run:
+```
+go run .
+```
 
+To start the application
+
+## Improvements
+- Validating expressions before attempting to parse them
+- Allow mathematical functions like sin(x), log(x) in expressions
+- Expose a consummable public API to be able to use as a libary/package
 <!-- ## Contributing
 
 If you'd like to contribute to the development of this calculator, please follow these guidelines:
