@@ -58,7 +58,6 @@ func TestParenthesisParsing(t *testing.T) {
 		calculator := parser.Parse()
 
 		actual := calculator.String()
-		t.Logf("input=%q, expected=%q, got=%q", tt.input, tt.expected, actual)
 		if actual != tt.expected {
 			t.Errorf("input=%q, expected=%q, got=%q", tt.input, tt.expected, actual)
 		}
