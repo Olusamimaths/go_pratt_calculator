@@ -41,7 +41,11 @@ func (l *Lexer) NextToken() Token {
 
 // Checks that the next token is of a given type
 func (l *Lexer) Expect(t TokenType) bool {
-	token := l.NextToken()
+	nextPosition := l.Position + 1
+	if nextPosition >= len(l.Tokens) {
+		return false
+	}
+	token := l.Tokens[nextPosition]
 	if token.Type != t {
 		panic(fmt.Sprintf("Invalid token encountered: %+v\n", token))
 	}

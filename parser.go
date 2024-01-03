@@ -33,6 +33,8 @@ func NewParser(l *Lexer) *Parser {
 	parser.NUDS = make(nudFns)
 	parser.registerNud(NUMBER, parser.parseNumberLiteral)
 	parser.registerNud(MINUS, parser.parsePrefixExpression)
+	parser.registerNud(LPAREN, parser.parsePrefixExpression)
+	parser.registerNud(RPAREN, parser.parsePrefixExpression)
 
 	parser.LEDS = make(ledFns)
 	parser.registerLed(PLUS, parser.parseInfixExpression)
@@ -85,8 +87,16 @@ func (p *Parser) parseNumberLiteral() (Expression, error) {
 }
 
 func (p *Parser) parsePrefixExpression() (Expression, error) {
-	if p.curToken.Type == LPAREN || p.curToken.Type == RPAREN {
-		return nil, nil
+	if p.curToken.Type == LPAREN {
+		p.nextToken()
+		expr, err := p.parseExpression(0)
+		if err != nil {
+			msg := fmt.Sprintf("an error occured passing ( expression: %q", err.Error())
+			p.errors = append(p.errors, msg)
+			return nil, err
+		}
+		p.nextToken()
+		return expr, err
 	}
 	expression := &PrefixExpression{
 		Operator: p.curToken.Literal,
@@ -132,24 +142,19 @@ func (p *Parser) parseInfixExpression(left Expression) (Expression, error) {
 
 // The core of the Pratt Parsing Algorithm
 func (p *Parser) parseExpression(rbp int) (Expression, error) {
-	fmt.Printf("\ncurrent token %+v\n", p.curToken)
-
 	nud := p.NUDS[p.curToken.Type]
 	if nud == nil {
-		fmt.Println("Here")
 		msg := fmt.Sprintf("could not find prefix parser for token type=%q", p.curToken.Type)
 		p.errors = append(p.errors, msg)
 		return nil, nil
 	}
-	fmt.Println("Left")
+
 	left, err := nud()
 	if err != nil {
 		return nil, err
 	}
-	for p.peekBindingPower() > rbp || p.curToken.Type == LPAREN {
-		if p.peekToken.Type == RPAREN {
-			break
-		}
+
+	for p.peekBindingPower() > rbp {
 		led := p.LEDS[p.peekToken.Type]
 		if led == nil {
 			return left, nil
