@@ -95,8 +95,11 @@ After pulling the code down to your machine, you can run:
 ```
 go run .
 ```
+To start the application. 
 
-To start the application
+This is what the app looks like:
+![image](https://github.com/Olusamimaths/go_pratt_calculator/assets/31919592/e3e7cd2a-d93b-4e6c-836f-db7d67027c54)
+
 
 ## Improvements
 - Validating expressions before attempting to parse them
