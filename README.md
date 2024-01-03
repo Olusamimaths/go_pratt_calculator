@@ -98,6 +98,7 @@ go run .
 To start the application. 
 
 This is what the app looks like:
+
 ![image](https://github.com/Olusamimaths/go_pratt_calculator/assets/31919592/e3e7cd2a-d93b-4e6c-836f-db7d67027c54)
 
 
