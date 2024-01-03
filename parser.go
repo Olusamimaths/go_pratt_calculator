@@ -199,3 +199,18 @@ func (p *Parser) nextToken() {
 func (p *Parser) Errors() []string {
 	return p.errors
 }
+
+func (p *Parser) LogErrors() {
+	errors := p.Errors()
+
+	if len(errors) == 0 {
+		return
+	}
+
+	fmt.Printf("parser has %d errors", len(errors))
+	for _, msg := range errors {
+		fmt.Printf("parser error: %q", msg)
+	}
+
+	panic("An error occured while parsing expression")
+}
